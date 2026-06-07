@@ -7,6 +7,8 @@ import in.prajwal.billingsoftware.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import java.util.UUID;
 
 @Service
@@ -20,6 +22,22 @@ public class CategoryServiceImpl implements CategoryService {
         CategoryEntity newCategory=convertToEntity(categoryRequest);
         newCategory=categoryRepository.save(newCategory);
         return convertToResponse(newCategory);
+    }
+
+    @Override
+    public List<CategoryResponse> read() {
+        return categoryRepository.
+                findAll().
+                stream().
+                map(this::convertToResponse).toList();
+    }
+
+    @Override
+    public void delete(String categoryId) {
+        CategoryEntity existingCategory=categoryRepository.findByCategoryId(categoryId)
+                .orElseThrow(()->new RuntimeException("Category not found with id: "+categoryId));
+        categoryRepository.delete(existingCategory);
+
     }
 
     private CategoryResponse convertToResponse(CategoryEntity newCategory) {
